@@ -59,6 +59,7 @@ def create_rft_fine_tuning_job(client, train_file_id: str, validation_file_id: s
             }
         },
         suffix="reward-hack-research",  # Model name suffix
+        seed=42
     )
     
     return response.id
