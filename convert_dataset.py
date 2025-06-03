@@ -146,13 +146,13 @@ def main():
     parser.add_argument(
         "--seed",
         type=int,
-        default=0,
-        help="Random seed for train/test split (default: 0)"
+        default=42,
+        help="Random seed for train/test split (default: 42)"
     )
     parser.add_argument(
         "--include-system-prompt",
-        action="store_true",
-        help="Include system prompt in messages (default: False)"
+        action="store_false",
+        help="Include system prompt in messages (default: True)"
     )
     parser.add_argument(
         "--max-test-case-length",

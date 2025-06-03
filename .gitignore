@@ -1,3 +1,6 @@
 
 # Environment variables
 .env
+
+rft_dataset
+rft_dataset_with_grader

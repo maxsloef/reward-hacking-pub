@@ -24,13 +24,8 @@ Python grader that:
 - Counts TEST_PASS and TEST_FAIL in output
 - Returns a score between 0.0 and 1.0
 
-### 3. `prepare_rft_dataset.py`
-Adds the grader configuration to the dataset and optionally:
-- Validates the grader with OpenAI API
-- Tests the grader with sample problems
-
-### 4. `example_fine_tuning.py`
-Shows how to create an RFT fine-tuning job with OpenAI API
+### 3. `example_fine_tuning.py`
+Shows how to create an RFT fine-tuning job with OpenAI API using the grader
 
 ## Setup
 
@@ -63,16 +58,7 @@ python convert_dataset.py --train-size 2000 --test-size 500
 python convert_dataset.py --train-size 2000 --test-size 500 --include-system-prompt
 ```
 
-### Step 2: Add grader to dataset
-```bash
-# Basic preparation
-python prepare_rft_dataset.py
-
-# With validation (requires OpenAI API key)
-python prepare_rft_dataset.py --validate --test
-```
-
-### Step 3: Create fine-tuning job
+### Step 2: Create fine-tuning job
 ```bash
 python example_fine_tuning.py
 ```

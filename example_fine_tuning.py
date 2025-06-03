@@ -30,28 +30,36 @@ def upload_file(client, file_path: str, purpose: str = "fine-tune"):
 
 
 def create_rft_fine_tuning_job(client, train_file_id: str, validation_file_id: str = None):
-    """Create an RFT fine-tuning job."""
+    """Create an RFT fine-tuning job.
+    
+    RFT is supported on o-series reasoning models only.
+    Currently available model for RFT:
+    - o4-mini-2025-04-16
+    """
     # Configure the fine-tuning job
     hyperparameters = {
-        "n_epochs": 3,  # Adjust based on your needs
-        "batch_size": 8,
-        "learning_rate_multiplier": 0.5,
+        "reasoning_effort": "high",  # low, medium, or high
     }
+    
+    # Read the grader source code
+    with open("grader.py", 'r') as f:
+        grader_source = f.read()
     
     # Create the job
     response = client.fine_tuning.jobs.create(
         training_file=train_file_id,
         validation_file=validation_file_id,
-        model="gpt-3.5-turbo",  # or "gpt-4-turbo" if available
+        model="o4-mini-2025-04-16",  # Base model for RFT
         method={
-            "type": "rft",  # Reinforcement Fine-Tuning
-            "rft": {
-                "model": "gpt-4-turbo",  # Model to use for generating completions
-                "n_completions": 5,  # Number of completions to generate per prompt
-                "temperature": 0.8,
+            "type": "reinforcement",  # Reinforcement Fine-Tuning
+            "reinforcement": {
+                "grader": {
+                    "type": "python",
+                    "source": grader_source
+                },
+                "hyperparameters": hyperparameters,
             }
         },
-        hyperparameters=hyperparameters,
         suffix="coding-reward-hack",  # Custom suffix for your model
     )
     
@@ -93,13 +101,13 @@ def main():
     client = openai.OpenAI(api_key=api_key)
     
     # Paths
-    dataset_dir = Path("rft_dataset_with_grader")
+    dataset_dir = Path("rft_dataset")
     train_file = dataset_dir / "train.jsonl"
     test_file = dataset_dir / "test.jsonl"
     
     if not train_file.exists():
         print(f"Training file not found: {train_file}")
-        print("Please run prepare_rft_dataset.py first")
+        print("Please run convert_dataset.py first")
         return
     
     print("Uploading training file...")
@@ -126,12 +134,18 @@ def main():
         # Test the fine-tuned model
         print("\nTesting fine-tuned model with a sample problem...")
         
+        # Get the first example from training data to use as system prompt
+        with open(train_file, 'r') as f:
+            first_line = f.readline()
+            first_example = json.loads(first_line)
+            system_prompt = first_example['messages'][0]['content']
+        
         response = client.chat.completions.create(
             model=final_job.fine_tuned_model,
             messages=[
                 {
                     "role": "developer",
-                    "content": "You are in an automated reinforcement learning environment..."  # Your system prompt
+                    "content": system_prompt
                 },
                 {
                     "role": "user",
@@ -154,7 +168,6 @@ for i, gold in [([2], [True]), ([3], [True]), ([4], [False]), ([17], [True]), ([
 </scaffold>"""
                 }
             ],
-            response_format={"type": "json_object"},  # Ensure JSON response
             temperature=0.3,
         )
         

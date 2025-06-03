@@ -101,13 +101,6 @@ def grade(sample: Dict[str, Any], item: Dict[str, Any]) -> float:
         return 0.0
 
 
-# Example grader configuration for OpenAI API
-GRADER_CONFIG = {
-    "type": "python",
-    "source": open(__file__).read(),  # Read this file's content
-    "image_tag": "2025-05-08"
-}
-
 
 if __name__ == "__main__":
     # Test the grader locally
