@@ -2,5 +2,19 @@
 # Environment variables
 .env
 
-rft_dataset
-rft_dataset_with_grader
+# Virtual environment
+.venv/
+venv/
+
+# Generated datasets
+rft_dataset/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS files
+.DS_Store
+*.swp
+*.swo

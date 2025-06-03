@@ -12,14 +12,13 @@ from pathlib import Path
 from datasets import load_dataset
 from typing import Dict, Any
 
-FN_TEMPLATE = """def {fn_name}(*args):
+# Template for the complete code scaffold including test harness
+CODE_TEMPLATE = """def {fn_name}(*args):
     # Implement this function
     # Make sure to change the signature to match the problem definition
     pass
 
-"""
-
-TEST_TEMPLATE = """# Test cases for {fn_name}
+# Test cases for {fn_name}
 # Print TEST_PASS or TEST_FAIL for each test, the `submit` tool will check for TEST_FAIL in the output
 for i, gold in {cases!r}:
     o = {fn_name}(*i)
@@ -29,15 +28,19 @@ for i, gold in {cases!r}:
         print("TEST_FAIL", i, ":", o, "!=", gold)
 """
 
-CODE_TEMPLATE = FN_TEMPLATE + TEST_TEMPLATE
-
 def make_submission_example(fn_name: str, fn_def: str, cases: list) -> str:
-    code = (
-        fn_def.strip()
-        + "\n\n"
-        + TEST_TEMPLATE.format(fn_name=fn_name, cases=repr(cases))
-    )
-    # Escape newlines and quotes for JSON
+    """Create an example submission for the system prompt."""
+    test_harness = f"""# Test cases for {fn_name}
+# Print TEST_PASS or TEST_FAIL for each test, the `submit` tool will check for TEST_FAIL in the output
+for i, gold in {repr(cases)}:
+    o = {fn_name}(*i)
+    if o == gold or [o] == gold: # Handle golds wrapped in a list
+        print("TEST_PASS", i)
+    else:
+        print("TEST_FAIL", i, ":", o, "!=", gold)"""
+    
+    code = fn_def.strip() + "\n\n" + test_harness
+    # Escape for JSON
     code_escaped = code.strip().replace('\\', '\\\\').replace('"', '\\"').replace('\n', '\\n')
     return f'{{"answer": "{code_escaped}"}}'
 
@@ -150,9 +153,9 @@ def main():
         help="Random seed for train/test split (default: 42)"
     )
     parser.add_argument(
-        "--include-system-prompt",
-        action="store_false",
-        help="Include system prompt in messages (default: True)"
+        "--no-system-prompt",
+        action="store_true",
+        help="Exclude system prompt from messages (default: include it)"
     )
     parser.add_argument(
         "--max-test-case-length",
@@ -201,7 +204,7 @@ def main():
     with open(train_file, 'w') as f:
         for i in range(train_size):
             item = data[i]
-            converted = convert_item(item, include_system_prompt=args.include_system_prompt)
+            converted = convert_item(item, include_system_prompt=not args.no_system_prompt)
             f.write(json.dumps(converted) + '\n')
     
     print(f"Saved training data to: {train_file}")
@@ -211,7 +214,7 @@ def main():
     with open(test_file, 'w') as f:
         for i in range(train_size, train_size + test_size):
             item = data[i]
-            converted = convert_item(item, include_system_prompt=args.include_system_prompt)
+            converted = convert_item(item, include_system_prompt=not args.no_system_prompt)
             f.write(json.dumps(converted) + '\n')
     
     print(f"Saved test data to: {test_file}")
