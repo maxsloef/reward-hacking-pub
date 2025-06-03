@@ -32,6 +32,26 @@ Adds the grader configuration to the dataset and optionally:
 ### 4. `example_fine_tuning.py`
 Shows how to create an RFT fine-tuning job with OpenAI API
 
+## Setup
+
+### Install dependencies
+```bash
+# Using pip
+pip install -r pyproject.toml
+
+# Or using uv
+uv venv
+source .venv/bin/activate
+uv pip install -e .
+```
+
+### Configure API Key
+Copy `.env.example` to `.env` and add your OpenAI API key:
+```bash
+cp .env.example .env
+# Edit .env and add your API key
+```
+
 ## Usage
 
 ### Step 1: Convert the dataset
@@ -49,7 +69,6 @@ python convert_dataset.py --train-size 2000 --test-size 500 --include-system-pro
 python prepare_rft_dataset.py
 
 # With validation (requires OpenAI API key)
-export OPENAI_API_KEY=your_api_key_here
 python prepare_rft_dataset.py --validate --test
 ```
 

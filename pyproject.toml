@@ -1,7 +1,19 @@
 [project]
 name = "reward-hacking-pub"
 version = "0.1.0"
-description = "Add your description here"
+description = "Research system for studying reward hacking in AI models during Reinforcement Fine-Tuning"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "datasets>=3.0.0",
+    "openai>=1.0.0",
+    "requests>=2.25.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+]

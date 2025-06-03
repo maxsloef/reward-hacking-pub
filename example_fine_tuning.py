@@ -13,6 +13,10 @@ import json
 import time
 import openai
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def upload_file(client, file_path: str, purpose: str = "fine-tune"):

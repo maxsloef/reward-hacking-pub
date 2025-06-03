@@ -15,6 +15,10 @@ import argparse
 import requests
 from pathlib import Path
 from typing import Dict, Any
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 def get_grader_source():
