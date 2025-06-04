@@ -101,8 +101,8 @@ def main():
     
     # Paths
     dataset_dir = Path("rft_dataset")
-    train_file = dataset_dir / "train.jsonl"
-    test_file = dataset_dir / "test.jsonl"
+    train_file = dataset_dir / "train_impossible.jsonl"
+    test_file = dataset_dir / "test_impossible.jsonl"
     
     if not train_file.exists():
         print(f"Training file not found: {train_file}")
